@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Variables y parámetros del modelo | Modelación de caja de supermercado</title>
+    <style>
+      body {
+        background: #f3f6fb;
+        color: #172033;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 2rem 1rem;
+      }
+
+      main {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgb(23 32 51 / 10%);
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 72rem;
+        padding: 2rem;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      h2 {
+        margin-top: 2.5rem;
+      }
+
+      p,
+      li {
+        line-height: 1.6;
+      }
+
+      .table-container {
+        margin: 1rem 0 2rem;
+        overflow-x: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        min-width: 68rem;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #dce3ed;
+        padding: 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f3f6fb;
+      }
+
+      td:first-child {
+        font-weight: 600;
+      }
+
+      @media (max-width: 36rem) {
+        main {
+          padding: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Variables y parámetros del modelo</h1>
+
+      <h2>Variables de entrada</h2>
+      <p>Las variables de entrada determinan cómo llegan los clientes y cuánto tiempo utilizan el servicio.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Unidad</th>
+              <th scope="col">Fuente</th>
+              <th scope="col">Distribución utilizada</th>
+              <th scope="col">Parámetros</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tiempo entre llegadas</td>
+              <td>Tiempo transcurrido entre la llegada de dos clientes consecutivos.</td>
+              <td>Cuantitativa continua.</td>
+              <td>Segundos.</td>
+              <td><code>BeginDateTime</code> del dataset POS, calculando diferencias entre llegadas consecutivas.</td>
+              <td>Empírica; exponencial como candidata por evaluar.</td>
+              <td>Empírica: frecuencias de los intervalos observados. Exponencial: λ = 1/t̄, donde t̄ es el intervalo medio estimado.</td>
+            </tr>
+            <tr>
+              <td>Tiempo de atención</td>
+              <td>Tiempo que utiliza el cajero para procesar una transacción.</td>
+              <td>Cuantitativa continua en el modelo; registrada en segundos enteros.</td>
+              <td>Segundos.</td>
+              <td>Variable <code>TranTime</code> del dataset POS.</td>
+              <td>Empírica. Lognormal como alternativa por contrastar.</td>
+              <td>Media preliminar: 73,70 s; desviación estándar: 64,35 s. La lognormal no se considera validada.</td>
+            </tr>
+            <tr>
+              <td>Cantidad de productos</td>
+              <td>Número de artículos que lleva cada cliente.</td>
+              <td>Cuantitativa discreta.</td>
+              <td>Artículos por cliente.</td>
+              <td>Variable <code>ArtNum</code> del dataset POS.</td>
+              <td>Empírica discreta.</td>
+              <td>Media preliminar: 14,34; desviación estándar: 14,90; mínimo: 1; máximo: 221.</td>
+            </tr>
+            <tr>
+              <td>Número de clientes</td>
+              <td>Cantidad de clientes que ingresan durante el horizonte de simulación.</td>
+              <td>Cuantitativa discreta.</td>
+              <td>Clientes.</td>
+              <td>Derivada de los registros de llegada del dataset y del horizonte definido para el experimento.</td>
+              <td>No requiere distribución adicional si se generan las llegadas a partir de los intervalos entre ellas.</td>
+              <td>Depende del horizonte temporal y del proceso de llegadas.</td>
+            </tr>
+            <tr>
+              <td>Número de cajeros</td>
+              <td>Cantidad de recursos disponibles para atender a los clientes.</td>
+              <td>Parámetro entero configurable.</td>
+              <td>Cajeros.</td>
+              <td>Escenarios definidos para el experimento de simulación.</td>
+              <td>No aplica; es un parámetro de control.</td>
+              <td>Escenario base: 1 cajero. Escenarios alternativos: 2, 3 o más cajeros, según lo que se desee comparar.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Justificación de las variables nuevas:</strong> el tiempo entre llegadas se calcula a partir de las marcas de tiempo del dataset; el número de clientes se deriva del proceso de llegadas; y el número de cajeros es un parámetro de experimentación necesario para responder la pregunta del documento: cómo cambia el tiempo de espera al agregar cajeros.</p>
+
+      <h2>3. Variables de estado y del proceso</h2>
+      <p>Estas variables permiten representar la evolución del sistema durante la simulación.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Unidad</th>
+              <th scope="col">Fuente</th>
+              <th scope="col">Distribución utilizada</th>
+              <th scope="col">Parámetros</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clientes en fila</td>
+              <td>Cantidad de clientes que esperan a que un cajero quede disponible.</td>
+              <td>Cuantitativa discreta; variable de estado.</td>
+              <td>Clientes.</td>
+              <td>Se calcula durante la simulación a partir de las llegadas y el inicio de atención.</td>
+              <td>No aplica directamente; es el resultado de las reglas del modelo.</td>
+              <td>Estado inicial: 0 clientes, como supuesto de un sistema vacío al inicio.</td>
+            </tr>
+            <tr>
+              <td>Cajeros ocupados</td>
+              <td>Cantidad de cajeros que están atendiendo clientes en un instante determinado.</td>
+              <td>Cuantitativa discreta; variable de estado.</td>
+              <td>Cajeros.</td>
+              <td>Estado del recurso en el modelo.</td>
+              <td>No aplica directamente.</td>
+              <td>Entre 0 y el número total de cajeros configurados.</td>
+            </tr>
+            <tr>
+              <td>Estado del cliente</td>
+              <td>Indica si el cliente está esperando, en atención o si terminó el proceso.</td>
+              <td>Cualitativa nominal.</td>
+              <td>No aplica.</td>
+              <td>Diagrama de flujo del documento, página 1.</td>
+              <td>No aplica; depende de las reglas de transición del modelo.</td>
+              <td>Estados: espera, atención y salida.</td>
+            </tr>
+            <tr>
+              <td>Tiempo de gestión de venta</td>
+              <td>Duración del proceso de escaneo de productos y cobro.</td>
+              <td>Cuantitativa continua en el modelo.</td>
+              <td>Segundos.</td>
+              <td>Variable <code>TranTime</code> del dataset POS.</td>
+              <td>Empírica, reutilizando el tiempo de atención.</td>
+              <td>Valores observados de <code>TranTime</code>. No se debe sumar un tiempo adicional por producto sin evidencia de que ya esté contemplado en esa duración.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>4. Variables de salida</h2>
+      <p>Son las medidas que permitirán comparar el desempeño del supermercado cuando se modifica la cantidad de cajeros.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Unidad</th>
+              <th scope="col">Fuente</th>
+              <th scope="col">Distribución utilizada</th>
+              <th scope="col">Parámetros</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Clientes atendidos</td>
+              <td>Total de clientes que completan el proceso de pago durante la simulación.</td>
+              <td>Cuantitativa discreta.</td>
+              <td>Clientes.</td>
+              <td>Contador del modelo.</td>
+              <td>No aplica directamente; se obtiene de la ejecución.</td>
+              <td>Conteo acumulado de clientes que finalizan el servicio.</td>
+            </tr>
+            <tr>
+              <td>Tiempo promedio de espera</td>
+              <td>Promedio del tiempo transcurrido desde la llegada hasta el inicio de la atención.</td>
+              <td>Cuantitativa continua.</td>
+              <td>Segundos o minutos.</td>
+              <td>Se calcula a partir de las marcas temporales simuladas de llegada e inicio de atención.</td>
+              <td>No requiere una distribución de entrada adicional.</td>
+              <td>W̄<sub>q</sub> = (1/N) Σ<sub>i=1</sub><sup>N</sup> W<sub>q,i</sub>, donde W<sub>q,i</sub> es el tiempo de espera del cliente i.</td>
+            </tr>
+            <tr>
+              <td>Cantidad de clientes en fila</td>
+              <td>Número de clientes que esperan en un instante o promedio de clientes en espera durante la simulación.</td>
+              <td>Cuantitativa discreta.</td>
+              <td>Clientes.</td>
+              <td>Estado de la cola durante la simulación.</td>
+              <td>No aplica directamente.</td>
+              <td>Puede medirse como valor instantáneo o promedio temporal; se debe especificar cuál se reporta.</td>
+            </tr>
+            <tr>
+              <td>Tiempo total en el sistema</td>
+              <td>Tiempo que transcurre desde la llegada del cliente hasta su salida.</td>
+              <td>Cuantitativa continua.</td>
+              <td>Segundos o minutos.</td>
+              <td>Se calcula con las marcas temporales simuladas de llegada y salida.</td>
+              <td>No requiere distribución de entrada adicional.</td>
+              <td>T<sub>i</sub> = W<sub>q,i</sub> + S<sub>i</sub>, donde S<sub>i</sub> es el tiempo de atención.</td>
+            </tr>
+            <tr>
+              <td>Utilización de los cajeros</td>
+              <td>Proporción del tiempo durante el cual los cajeros permanecen ocupados.</td>
+              <td>Cuantitativa continua.</td>
+              <td>Porcentaje.</td>
+              <td>Tiempos de ocupación y disponibilidad registrados por el modelo.</td>
+              <td>No aplica directamente.</td>
+              <td>U = tiempo total ocupado / (c × tiempo de simulación), donde c es el número de cajeros.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. Parámetros generales del modelo</h2>
+      <p>Además de las variables, el modelo necesita parámetros que definan las condiciones del experimento.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Parámetro</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Valor o criterio de definición</th>
+              <th scope="col">Justificación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Número de cajeros (c)</td>
+              <td>Recursos disponibles para atender clientes.</td>
+              <td>1 para el escenario base; después se comparan 2, 3 y más.</td>
+              <td>Es la variable de decisión principal del problema.</td>
+            </tr>
+            <tr>
+              <td>Horizonte de simulación</td>
+              <td>Tiempo total durante el cual se ejecuta el modelo.</td>
+              <td>Debe establecerse antes de ejecutar los experimentos.</td>
+              <td>Permite comparar escenarios bajo una duración común.</td>
+            </tr>
+            <tr>
+              <td>Estado inicial</td>
+              <td>Condición de la fila y los cajeros al comenzar.</td>
+              <td>Cola vacía y todos los cajeros libres.</td>
+              <td>Supuesto inicial que facilita la comparación; debe documentarse.</td>
+            </tr>
+            <tr>
+              <td>Regla de atención</td>
+              <td>Orden en el que los clientes pasan a caja.</td>
+              <td>Primero en llegar, primero en ser atendido (FIFO).</td>
+              <td>Supuesto operativo razonable para una fila convencional, aunque el documento no especifica expresamente la disciplina.</td>
+            </tr>
+            <tr>
+              <td>Número de repeticiones</td>
+              <td>Cantidad de ejecuciones independientes del modelo.</td>
+              <td>Se determina según la variabilidad de los resultados y la precisión deseada.</td>
+              <td>Permite evaluar la variabilidad entre ejecuciones.</td>
+            </tr>
+            <tr>
+              <td>Semilla pseudoaleatoria</td>
+              <td>Valor inicial del generador de números aleatorios.</td>
+              <td>Registrar una semilla por ejecución o un esquema reproducible de semillas.</td>
+              <td>Facilita la reproducibilidad y la comparación entre escenarios.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>6. Fuentes y supuestos que deben documentarse</h2>
+      <p>Las variables de transacción provienen del dataset POS, mientras que el flujo operativo y el objetivo de comparación provienen del documento <em>Funcionamiento del sistema</em>.</p>
+      <p>Se deben dejar explícitos los siguientes puntos:</p>
+      <ul>
+        <li>El dataset contiene transacciones observadas, no una medición directa de todos los clientes que llegaron y abandonaron el sistema.</li>
+        <li><code>BeginDateTime</code> registra el comienzo de una transacción; utilizarlo como instante de llegada del cliente requiere comprobar que ambos acontecimientos coinciden.</li>
+        <li><code>TranTime</code> representa la duración registrada de una transacción. Su correspondencia exacta con el tiempo de servicio debe comprobarse antes de usarlo en el modelo.</li>
+        <li>El número de cajeros, el horizonte de simulación y el estado inicial son decisiones del diseño experimental, no datos observados del dataset.</li>
+        <li>Las distribuciones empíricas propuestas reproducen los valores observados. Las distribuciones teóricas alternativas deben contrastarse antes de seleccionarlas definitivamente.</li>
+      </ul>
+
+      <a href="{{ url_for('home') }}">Volver al inicio</a>
+    </main>
+  </body>
+</html>

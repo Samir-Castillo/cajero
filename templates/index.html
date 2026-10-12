@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modelación de caja de supermercado</title>
+    <style>
+      body {
+        align-items: center;
+        background: #f3f6fb;
+        color: #172033;
+        display: flex;
+        font-family: system-ui, sans-serif;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      main {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgb(23 32 51 / 10%);
+        max-width: 36rem;
+        padding: 2.5rem;
+        text-align: center;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      nav a {
+        color: #2457a7;
+        display: inline-block;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Modelación de caja de supermercado</h1>
+      <p>Selecciona una página para continuar.</p>
+      <nav aria-label="Páginas del sistema">
+        <a href="{{ url_for('definicion_sistema') }}">Definición del sistema</a>
+        <a href="{{ url_for('problema') }}">Problema</a>
+        <a href="{{ url_for('variables_parametros') }}">Variables y parámetros del modelo</a>
+        <a href="{{ url_for('relaciones_logico_matematicas') }}">Relaciones lógico-matemáticas del sistema</a>
+      </nav>
+    </main>
+  </body>
+</html>

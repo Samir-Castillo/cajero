@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Definición del sistema</title>
+    <style>
+      body {
+        background: #f3f6fb;
+        color: #172033;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 2rem 1rem;
+      }
+
+      main {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgb(23 32 51 / 10%);
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 52rem;
+        padding: 2rem;
+      }
+
+      h1 {
+        margin: 0 0 1rem;
+      }
+
+      h2 {
+        margin: 1.75rem 0 0.5rem;
+      }
+
+      p {
+        line-height: 1.6;
+      }
+
+      img {
+        border: 1px solid #dce3ed;
+        border-radius: 8px;
+        display: block;
+        height: auto;
+        margin: 1rem auto 2rem;
+        max-width: 100%;
+      }
+
+      ul {
+        line-height: 1.8;
+        margin-bottom: 0;
+      }
+
+      @media (max-width: 36rem) {
+        main {
+          padding: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Funcionamiento del sistema.</h1>
+      <img
+        src="{{ url_for('static', filename='Flujo del cajero de supermercado.png') }}"
+        alt="Diagrama del flujo de atención en una caja de supermercado"
+      >
+
+      <h2>Elementos que lo componen.</h2>
+      <p>Cliente, productos, tiempo de fila, tiempo de gestión de venta (depende de la cantidad de productos) y cajero.</p>
+
+      <h2>Variables de entrada</h2>
+      <ul>
+        <li>Tiempo entre llegadas de clientes</li>
+        <li>Tiempo de atención</li>
+        <li>Cantidad de productos del cliente</li>
+        <li>Clientes</li>
+      </ul>
+
+      <h2>Variables de salida</h2>
+      <ul>
+        <li>Clientes atendidos</li>
+        <li>Tiempo promedio de espera</li>
+        <li>Cantidad de clientes en fila</li>
+        <li>Tiempo total en el sistema</li>
+      </ul>
+
+      <h2>Entidades</h2>
+      <ul>
+        <li>Cliente</li>
+      </ul>
+
+      <h2>Recurso</h2>
+      <ul>
+        <li>Cajero</li>
+      </ul>
+
+      <h2>Procesos</h2>
+      <ul>
+        <li>Tiempo de gestión de venta</li>
+      </ul>
+
+      <h2>Restricciones relevantes.</h2>
+      <p>Solo se puede atender una persona por cajero.</p>
+
+      <a href="{{ url_for('home') }}">Volver al inicio</a>
+    </main>
+  </body>
+</html>

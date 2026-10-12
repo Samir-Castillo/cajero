@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Relaciones lógico-matemáticas del sistema | Modelación de caja de supermercado</title>
+    <style>
+      body {
+        background: #f3f6fb;
+        color: #172033;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 2rem 1rem;
+      }
+
+      main {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgb(23 32 51 / 10%);
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 72rem;
+        padding: 2rem;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      h2 {
+        margin-top: 2.5rem;
+      }
+
+      h3 {
+        margin-top: 1.75rem;
+      }
+
+      p {
+        line-height: 1.6;
+      }
+
+      .equation {
+        background: #f3f6fb;
+        border-left: 3px solid #2457a7;
+        font-family: ui-monospace, monospace;
+        overflow-x: auto;
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+      }
+
+      .table-container {
+        margin: 1rem 0 2rem;
+        overflow-x: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        min-width: 40rem;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #dce3ed;
+        padding: 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f3f6fb;
+      }
+
+      td:first-child {
+        font-weight: 600;
+      }
+
+      @media (max-width: 36rem) {
+        main {
+          padding: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Relaciones lógico-matemáticas del sistema de simulación</h1>
+      <p>Modelo de simulación discreta de cajas de supermercado</p>
+
+      <h2>1. Descripción del sistema</h2>
+      <p>El modelo representa el funcionamiento de un supermercado con una fila de espera y uno o varios cajeros. Un cliente que encuentra un cajero disponible inicia su atención; de lo contrario, espera en la fila hasta que un cajero quede libre. Al terminar el pago, el cliente sale del sistema. El objetivo es comparar los tiempos de espera cuando se modifica la cantidad de cajeros.</p>
+
+      <h2>2. Variables y parámetros principales</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Símbolo</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Unidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>N</td><td>Número total de clientes que llegan al sistema</td><td>Clientes</td></tr>
+            <tr><td>c</td><td>Número de cajeros disponibles</td><td>Cajeros</td></tr>
+            <tr><td>A<sub>i</sub></td><td>Instante de llegada del cliente i</td><td>Segundos</td></tr>
+            <tr><td>I<sub>i</sub></td><td>Tiempo entre la llegada del cliente i y el anterior</td><td>Segundos</td></tr>
+            <tr><td>S<sub>i</sub></td><td>Tiempo de atención del cliente i</td><td>Segundos</td></tr>
+            <tr><td>B<sub>i</sub></td><td>Instante en que comienza la atención del cliente i</td><td>Segundos</td></tr>
+            <tr><td>D<sub>i</sub></td><td>Instante en que termina la atención del cliente i</td><td>Segundos</td></tr>
+            <tr><td>W<sub>i</sub></td><td>Tiempo que espera el cliente i antes de ser atendido</td><td>Segundos</td></tr>
+            <tr><td>T<sub>i</sub></td><td>Tiempo total del cliente i dentro del sistema</td><td>Segundos</td></tr>
+            <tr><td>Q(t)</td><td>Número de clientes esperando en el instante t</td><td>Clientes</td></tr>
+            <tr><td>O(t)</td><td>Número de cajeros ocupados en el instante t</td><td>Cajeros</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. Relaciones entre las llegadas de los clientes</h2>
+      <h3>3.1. Tiempo entre llegadas</h3>
+      <p>El instante de llegada de cada cliente se calcula a partir del instante de llegada anterior y del tiempo entre ambas llegadas:</p>
+      <p class="equation">A<sub>i</sub> = A<sub>i−1</sub> + I<sub>i</sub></p>
+      <p>A<sub>i</sub> representa el instante de llegada del cliente actual, A<sub>i−1</sub> el instante de llegada del cliente anterior e I<sub>i</sub> el tiempo entre llegadas consecutivas. Para el primer cliente se establece A<sub>1</sub> = I<sub>1</sub> si el reloj comienza en cero y I<sub>1</sub> representa el tiempo hasta su llegada.</p>
+
+      <h3>3.2. Generación de los tiempos entre llegadas</h3>
+      <p>Si se utiliza una distribución empírica, se selecciona un intervalo observado de acuerdo con las probabilidades estimadas de sus valores.</p>
+      <p class="equation">I<sub>i</sub> ~ Exponencial(λ)</p>
+      <p class="equation">f(t) = λe<sup>−λt</sup>, &nbsp; t ≥ 0 &nbsp; y &nbsp; λ = 1 / Ī</p>
+      <p>La distribución exponencial es una alternativa que debe evaluarse, no una distribución validada por el dataset POS. Ī representa el tiempo medio entre llegadas y λ la tasa de llegadas por unidad de tiempo.</p>
+
+      <h2>4. Relaciones del proceso de atención</h2>
+      <h3>4.1. Disponibilidad de los cajeros</h3>
+      <p>Sea F<sub>j</sub> el instante en que el cajero j termina de atender a su cliente anterior. Si todos los cajeros están libres al inicio, F<sub>j</sub> = 0 para j = 1, …, c.</p>
+      <p class="equation">B<sub>i</sub> = max(A<sub>i</sub>, min<sub>j</sub> F<sub>j</sub>)</p>
+      <p>El instante de inicio de atención es el mayor entre la llegada del cliente y el instante más temprano en que un cajero queda disponible. Si hay un cajero libre a la llegada, la atención comienza inmediatamente; si todos están ocupados, el cliente espera.</p>
+
+      <h3>4.2. Tiempo de espera</h3>
+      <p class="equation">W<sub>i</sub> = B<sub>i</sub> − A<sub>i</sub> ≥ 0</p>
+      <p>Si un cajero está disponible al llegar el cliente, B<sub>i</sub> = A<sub>i</sub> y W<sub>i</sub> = 0. Si todos están ocupados, W<sub>i</sub> &gt; 0.</p>
+
+      <h3>4.3. Finalización de la atención</h3>
+      <p class="equation">D<sub>i</sub> = B<sub>i</sub> + S<sub>i</sub></p>
+      <p>El instante de salida de la caja se calcula sumando el tiempo de atención al instante en que comenzó el servicio.</p>
+
+      <h3>4.4. Actualización de la disponibilidad del cajero</h3>
+      <p>Si el cliente i es asignado al cajero j, la disponibilidad de ese recurso se actualiza como F<sub>j</sub> = D<sub>i</sub>. Los demás cajeros conservan sus instantes de disponibilidad hasta que atiendan a otro cliente.</p>
+
+      <h2>5. Relaciones para la fila de espera</h2>
+      <h3>5.1. Número de clientes en el sistema</h3>
+      <p class="equation">L(t) = Q(t) + O(t)</p>
+      <p>L(t) es el total de clientes dentro del sistema, Q(t) los clientes en espera y O(t) los clientes en atención. Se cumple 0 ≤ O(t) ≤ c.</p>
+
+      <h3>5.2. Evolución de la cola</h3>
+      <p class="equation">L(t) = N<sub>a</sub>(t) − N<sub>d</sub>(t)</p>
+      <p class="equation">Q(t) = N<sub>a</sub>(t) − N<sub>d</sub>(t) − O(t) ≥ 0</p>
+      <p>N<sub>a</sub>(t) es el número acumulado de llegadas hasta t y N<sub>d</sub>(t) el número acumulado de clientes que terminaron su atención. Para una fila sin límite de capacidad, no se establece un máximo de clientes en espera; esta condición es un supuesto del modelo.</p>
+
+      <h3>5.3. Regla de decisión del sistema</h3>
+      <ul>
+        <li>Si existe un cajero disponible: el cliente inicia la atención inmediatamente y su tiempo de espera es cero.</li>
+        <li>Si todos los cajeros están ocupados: el cliente se incorpora a la fila y espera hasta que se libere un recurso.</li>
+        <li>Al finalizar el servicio: el cliente sale del sistema y el cajero queda disponible para el siguiente cliente.</li>
+      </ul>
+      <p>Se utiliza la disciplina FIFO (primero en llegar, primero en ser atendido) como supuesto de una fila común.</p>
+
+      <h2>6. Relación entre cantidad de productos y tiempo de atención</h2>
+      <p>El documento de funcionamiento señala que el tiempo de gestión de la venta depende de la cantidad de productos. Si existen datos suficientes, puede evaluarse el siguiente modelo:</p>
+      <p class="equation">S<sub>i</sub> = α + βP<sub>i</sub> + ε<sub>i</sub></p>
+      <p>S<sub>i</sub> es el tiempo de atención; P<sub>i</sub> la cantidad de productos; α el tiempo fijo de atención; β el tiempo adicional medio por producto; y ε<sub>i</sub> la variabilidad no explicada. α y β deben estimarse con los datos y validarse.</p>
+      <p>Para el modelo inicial se recomienda utilizar directamente la distribución empírica de <code>TranTime</code>, sin añadir un efecto adicional por producto, hasta comprobar si ese efecto ya está incluido en la duración observada.</p>
+
+      <h2>7. Relaciones para medir los resultados</h2>
+      <h3>7.1. Tiempo promedio de espera</h3>
+      <p class="equation">W̄ = (1/N) Σ W<sub>i</sub></p>
+      <p>Promedio del tiempo transcurrido desde la llegada hasta el inicio de atención, para los N clientes considerados.</p>
+
+      <h3>7.2. Tiempo promedio en el sistema</h3>
+      <p class="equation">T<sub>i</sub> = D<sub>i</sub> − A<sub>i</sub> = W<sub>i</sub> + S<sub>i</sub></p>
+      <p class="equation">T̄ = (1/N) Σ T<sub>i</sub></p>
+
+      <h3>7.3. Clientes atendidos</h3>
+      <p class="equation">C<sub>atendidos</sub> = N<sub>d</sub>(H)</p>
+      <p>N<sub>d</sub>(H) es el número de clientes que terminaron la atención antes del horizonte de simulación H. Puede ser menor que el número de llegadas si quedan clientes en espera o en servicio al finalizar.</p>
+
+      <h3>7.4. Utilización de los cajeros</h3>
+      <p class="equation">U = (tiempo total ocupado) / (c × H)</p>
+      <p>U es la utilización global de los cajeros, c el número de cajeros y H la duración del horizonte. Se cumple 0 ≤ U ≤ 1; en porcentaje se expresa como 100U.</p>
+
+      <h2>8. Capacidades, restricciones y probabilidades</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Elemento</th>
+              <th scope="col">Relación</th>
+              <th scope="col">Interpretación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Cantidad de cajeros</td><td>c ∈ ℤ; c ≥ 1</td><td>El número de recursos es un entero positivo.</td></tr>
+            <tr><td>Disponibilidad</td><td>0 ≤ O(t) ≤ c</td><td>No pueden estar ocupados más cajeros de los existentes.</td></tr>
+            <tr><td>Tiempo de espera</td><td>W<sub>i</sub> ≥ 0</td><td>No existe espera negativa.</td></tr>
+            <tr><td>Tiempo de atención</td><td>S<sub>i</sub> &gt; 0</td><td>La duración del servicio debe ser positiva.</td></tr>
+            <tr><td>Tiempo entre llegadas</td><td>I<sub>i</sub> &gt; 0</td><td>Los clientes llegan en instantes sucesivos.</td></tr>
+            <tr><td>Orden de atención</td><td>FIFO</td><td>Se atiende primero a quien lleva más tiempo esperando, bajo la regla de fila común.</td></tr>
+            <tr><td>Probabilidad empírica</td><td>p<sub>k</sub> = n<sub>k</sub> / N</td><td>La probabilidad de un valor o categoría se estima por su frecuencia relativa.</td></tr>
+            <tr><td>Normalización</td><td>Σ p<sub>k</sub> = 1</td><td>Las probabilidades de todos los valores posibles suman uno.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Para <code>ArtNum</code>, p<sub>k</sub> representa la probabilidad empírica de que un cliente lleve k artículos. La misma idea puede aplicarse a los tiempos de atención y a los intervalos entre llegadas.</p>
+
+      <a href="{{ url_for('home') }}">Volver al inicio</a>
+    </main>
+  </body>
+</html>
