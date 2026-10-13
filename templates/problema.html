@@ -35,9 +35,23 @@
   <body>
     <main>
       <h1>Planteamiento del problema de simulación</h1>
-      <p>En el supermercado tienen un solo cajero. Los dueños desean saber si agregando más cajeros se podrá tener mejores tiempos en la fila de espera dentro del supermercado.</p>
-      <p>¿Cómo se modificará el tiempo en la fila si se tienen más cajeros en el supermercado?</p>
-      <a href="{{ url_for('home') }}">Volver al inicio</a>
+      
+      <h2>1. Situación que se desea analizar</h2>
+      <p>La operación del área de cajas de pago de un supermercado durante la jornada de atención. Actualmente se opera bajo una configuración de <strong>un único cajero activo</strong> (sistema monopuesto), donde los clientes forman una fila única conforme terminan su selección de artículos para ser atendidos secuencialmente.</p>
+
+      <h2>2. Causa o situación que motiva el estudio</h2>
+      <p>Durante los períodos de afluencia constante, la capacidad de procesamiento de un único cajero resulta insuficiente ante la variabilidad estocástica en los intervalos de llegada de los clientes y la dispersión en los tiempos de cobro (dependientes del número de artículos por carrito). Esto genera cuellos de botella severos, congestión en el punto de cobro, filas prolongadas y tiempos de espera excesivos que deterioran la experiencia del cliente y arriesgan la pérdida de ventas por abandono o insatisfacción.</p>
+
+      <h2>3. Variable de interés</h2>
+      <p>La variable de salida principal para evaluar y comparar el desempeño del sistema es el <strong>Tiempo promedio de espera en la fila (<i>W</i><sub>q</sub>)</strong>, medido en segundos y minutos desde el instante en que el cliente se incorpora a la cola hasta que es llamado por un cajero libre. De forma complementaria se analizan la longitud promedio de la fila (<i>L</i><sub>q</sub>) y el porcentaje de utilización de los cajeros (<i>U</i>).</p>
+
+      <h2>4. Pregunta que se desea responder mediante la simulación</h2>
+      <p><em>¿Cómo se modificará el tiempo promedio de espera en la fila si se incrementa el número de cajeros activos en el supermercado (de 1 a 2 o más cajeros), y cuál es la configuración óptima que mitiga la congestión manteniendo una utilización eficiente del personal?</em></p>
+
+      <div style="margin-top: 2rem;">
+        <a href="{{ url_for('home') }}">Volver al inicio</a> | 
+        <a href="{{ url_for('simulador') }}">Ir al Simulador Interactivo</a>
+      </div>
     </main>
   </body>
 </html>
