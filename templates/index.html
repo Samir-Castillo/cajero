@@ -3,49 +3,158 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Modelación de caja de supermercado</title>
+    <title>Modelación y Simulación de Cajas de Supermercado</title>
     <style>
+      :root {
+        --primary: #2457a7;
+        --primary-hover: #1a4180;
+        --bg: #f3f6fb;
+        --card-bg: #ffffff;
+        --text: #172033;
+        --border: #dce3ed;
+      }
+
       body {
         align-items: center;
-        background: #f3f6fb;
-        color: #172033;
+        background: var(--bg);
+        color: var(--text);
         display: flex;
-        font-family: system-ui, sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         justify-content: center;
         margin: 0;
         min-height: 100vh;
+        padding: 2rem 1rem;
       }
 
       main {
-        background: white;
+        background: var(--card-bg);
         border-radius: 12px;
-        box-shadow: 0 8px 30px rgb(23 32 51 / 10%);
-        max-width: 36rem;
+        box-shadow: 0 8px 30px rgba(23, 32, 51, 0.1);
+        box-sizing: border-box;
+        max-width: 48rem;
         padding: 2.5rem;
-        text-align: center;
+        width: 100%;
       }
 
       h1 {
+        color: var(--primary);
+        font-size: 1.8rem;
         margin-top: 0;
+        text-align: center;
       }
 
-      nav a {
-        color: #2457a7;
-        display: inline-block;
-        margin-top: 1rem;
+      .subtitle {
+        color: #4b5563;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .section-group {
+        border-top: 1px solid var(--border);
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+      }
+
+      .section-title {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+      }
+
+      .nav-grid {
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+      }
+
+      .nav-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: inherit;
+        display: block;
+        padding: 1rem 1.25rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .nav-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(36, 87, 167, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .nav-card h3 {
+        color: var(--primary);
+        font-size: 1rem;
+        margin: 0 0 0.3rem;
+      }
+
+      .nav-card p {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 0;
+      }
+
+      .nav-card.featured {
+        background: #eff6ff;
+        border-color: #93c5fd;
+      }
+
+      .nav-card.featured h3 {
+        color: #1d4ed8;
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>Modelación de caja de supermercado</h1>
-      <p>Selecciona una página para continuar.</p>
-      <nav aria-label="Páginas del sistema">
-        <a href="{{ url_for('definicion_sistema') }}">Definición del sistema</a>
-        <a href="{{ url_for('problema') }}">Problema</a>
-        <a href="{{ url_for('variables_parametros') }}">Variables y parámetros del modelo</a>
-        <a href="{{ url_for('relaciones_logico_matematicas') }}">Relaciones lógico-matemáticas del sistema</a>
-      </nav>
+      <h1>Modelación y Simulación de Cajas de Supermercado</h1>
+      <p class="subtitle">Sistema de colas multicanal FIFO y evaluación de impacto de incremento de cajeros.</p>
+
+      <div class="section-group">
+        <div class="section-title">Fase 1: Formulación Conceptual y Matemática</div>
+        <div class="nav-grid">
+          <a class="nav-card" href="{{ url_for('definicion_sistema') }}">
+            <h3>1. Definición del Sistema</h3>
+            <p>Elementos, entidades, recursos, procesos, flujo y restricciones operativas.</p>
+          </a>
+          <a class="nav-card" href="{{ url_for('problema') }}">
+            <h3>2. Planteamiento del Problema</h3>
+            <p>Situación monopuesto, causa, variable de interés (<i>W</i><sub>q</sub>) y pregunta clave.</p>
+          </a>
+          <a class="nav-card" href="{{ url_for('variables_parametros') }}">
+            <h3>3. Variables y Parámetros</h3>
+            <p>Variables de entrada, estado, salida y parámetros derivados del dataset POS.</p>
+          </a>
+          <a class="nav-card" href="{{ url_for('relaciones_logico_matematicas') }}">
+            <h3>4. Relaciones Lógico-Matemáticas</h3>
+            <p>Ecuaciones de eventos discretos, asignación de cajeros y métricas de colas.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="section-group">
+        <div class="section-title">Fase 2: Simulación Computacional y Experimentación</div>
+        <div class="nav-grid">
+          <a class="nav-card featured" href="{{ url_for('simulador') }}">
+            <h3>5 y 7. Simulador Interactivo de Eventos Discretos</h3>
+            <p>Ejecución en vivo con generador LCG, réplicas independientes, gráficos Chart.js y traza paso a paso.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="section-group">
+        <div class="section-title">Fase 3: Verificación, Inferencia y Toma de Decisiones</div>
+        <div class="nav-grid">
+          <a class="nav-card featured" href="{{ url_for('estudio_estadistico') }}">
+            <h3>6 al 12. Estudio Estadístico Completo</h3>
+            <p>Verificación (pruebas unitarias), validación con Erlang-C, pruebas de hipótesis de Welch, intervalos al 95%, escenarios y conclusiones.</p>
+          </a>
+        </div>
+      </div>
     </main>
   </body>
 </html>

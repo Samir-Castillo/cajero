@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulador de Cajas de Supermercado | Modelación y Simulación</title>
+    <!-- Chart.js para visualización de métricas e histogramas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --primary: #2457a7;
+        --primary-light: #e8f0fe;
+        --success: #198754;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --bg: #f3f6fb;
+        --card-bg: #ffffff;
+        --text: #172033;
+        --border: #dce3ed;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 2rem 1rem;
+      }
+
+      main {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(23, 32, 51, 0.08);
+        box-sizing: border-box;
+        margin: 0 auto;
+        max-width: 80rem;
+        padding: 2.5rem;
+      }
+
+      header {
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+      }
+
+      h1 {
+        color: var(--primary);
+        margin: 0 0 0.5rem;
+      }
+
+      nav a {
+        color: var(--primary);
+        font-weight: 500;
+        margin-right: 1.25rem;
+        text-decoration: none;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .grid-controls {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+
+      .form-group input,
+      .form-group select {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.95rem;
+        padding: 0.55rem 0.75rem;
+      }
+
+      .btn-container {
+        align-items: flex-end;
+        display: flex;
+        gap: 0.75rem;
+        grid-column: 1 / -1;
+      }
+
+      button {
+        background: var(--primary);
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background: #1a4180;
+      }
+
+      button.btn-secondary {
+        background: #4b5563;
+      }
+
+      button.btn-secondary:hover {
+        background: #374151;
+      }
+
+      .kpi-grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        margin-bottom: 2rem;
+      }
+
+      .kpi-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        padding: 1.25rem;
+        text-align: center;
+      }
+
+      .kpi-card h4 {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 0 0 0.5rem;
+        text-transform: uppercase;
+      }
+
+      .kpi-card .value {
+        color: var(--primary);
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .kpi-card .subtitle {
+        color: #64748b;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+      }
+
+      .charts-grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 2.5rem;
+      }
+
+      @media (max-width: 60rem) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .chart-container {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+
+      .chart-container h3 {
+        font-size: 1.1rem;
+        margin-top: 0;
+      }
+
+      .table-container {
+        margin: 1.5rem 0 2.5rem;
+        max-height: 25rem;
+        overflow-y: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 0.65rem;
+        text-align: left;
+      }
+
+      th {
+        background: var(--bg);
+        position: sticky;
+        top: 0;
+      }
+
+      .badge-ok {
+        background: #dcfce7;
+        border-radius: 4px;
+        color: #166534;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+      }
+
+      .badge-busy {
+        background: #fee2e2;
+        border-radius: 4px;
+        color: #991b1b;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Simulador Interactivo de Cajas de Supermercado</h1>
+        <p>Modelo de simulación de eventos discretos con arquitectura multicanal FIFO y generador pseudoaleatorio LCG.</p>
+        <nav>
+          <a href="{{ url_for('home') }}">Inicio</a>
+          <a href="{{ url_for('problema') }}">Problema</a>
+          <a href="{{ url_for('definicion_sistema') }}">Definición del Sistema</a>
+          <a href="{{ url_for('variables_parametros') }}">Variables y Parámetros</a>
+          <a href="{{ url_for('relaciones_logico_matematicas') }}">Relaciones Matemáticas</a>
+          <a href="{{ url_for('estudio_estadistico') }}">Estudio Estadístico Completo</a>
+        </nav>
+      </header>
+
+      <!-- Panel de Controles -->
+      <form id="simForm" onsubmit="event.preventDefault(); runSimulation();">
+        <div class="grid-controls">
+          <div class="form-group">
+            <label for="num_cajeros">Número de Cajeros (<i>c</i>):</label>
+            <select id="num_cajeros" name="num_cajeros">
+              <option value="1">1 Cajero (Escenario Actual)</option>
+              <option value="2" selected>2 Cajeros (Escenario Propuesto)</option>
+              <option value="3">3 Cajeros (Escenario Expansión)</option>
+              <option value="4">4 Cajeros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="horizon_seconds">Horizonte de Simulación:</label>
+            <select id="horizon_seconds" name="horizon_seconds">
+              <option value="14400">4 Horas (14.400 s)</option>
+              <option value="28800" selected>8 Horas (28.800 s - Turno Completo)</option>
+              <option value="43200">12 Horas (43.200 s)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="mean_interarrival">Tiempo Medio entre Llegadas (<i>Ī</i> en s):</label>
+            <input type="number" id="mean_interarrival" name="mean_interarrival" value="90" step="5" min="10">
+          </div>
+
+          <div class="form-group">
+            <label for="service_mean">Tiempo Medio de Servicio (<i>S̄</i> en s):</label>
+            <input type="number" id="service_mean" name="service_mean" value="73.7" step="0.1" min="1">
+          </div>
+
+          <div class="form-group">
+            <label for="service_std">Desviación Estándar de Servicio (&sigma; en s):</label>
+            <input type="number" id="service_std" name="service_std" value="64.35" step="0.1" min="1">
+          </div>
+
+          <div class="form-group">
+            <label for="service_dist">Distribución de Servicio:</label>
+            <select id="service_dist" name="service_dist">
+              <option value="lognormal" selected>Lognormal (Dataset POS TranTime)</option>
+              <option value="exponential">Exponencial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="replications">Número de Réplicas (<i>R</i>):</label>
+            <input type="number" id="replications" name="replications" value="30" min="5" max="100">
+          </div>
+
+          <div class="form-group">
+            <label for="seed">Semilla Base (LCG):</label>
+            <input type="number" id="seed" name="seed" value="1001" min="1">
+          </div>
+
+          <div class="btn-container">
+            <button type="submit" id="btnRun">Ejecutar Simulación</button>
+            <button type="button" class="btn-secondary" onclick="presetScenario(1)">Probar c=1</button>
+            <button type="button" class="btn-secondary" onclick="presetScenario(2)">Probar c=2</button>
+            <button type="button" class="btn-secondary" onclick="presetScenario(3)">Probar c=3</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Tarjetas KPI -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <h4>Tiempo Medio en Fila (<i>W</i><sub>q</sub>)</h4>
+          <div class="value" id="kpi_wait">--</div>
+          <div class="subtitle" id="kpi_wait_sub">Segundos promedio</div>
+        </div>
+
+        <div class="kpi-card">
+          <h4>Tiempo Total en Sistema (<i>T</i>)</h4>
+          <div class="value" id="kpi_system">--</div>
+          <div class="subtitle">Espera + Atención</div>
+        </div>
+
+        <div class="kpi-card">
+          <h4>Utilización de Cajeros (<i>U</i>)</h4>
+          <div class="value" id="kpi_util">--</div>
+          <div class="subtitle">Tiempo ocupado vs disponible</div>
+        </div>
+
+        <div class="kpi-card">
+          <h4>Clientes Atendidos (<i>N</i><sub>d</sub>)</h4>
+          <div class="value" id="kpi_completed">--</div>
+          <div class="subtitle" id="kpi_arrivals">Total arribos: --</div>
+        </div>
+
+        <div class="kpi-card">
+          <h4>Longitud Media de Fila (<i>L</i><sub>q</sub>)</h4>
+          <div class="value" id="kpi_queue">--</div>
+          <div class="subtitle">Clientes en espera</div>
+        </div>
+      </section>
+
+      <!-- Gráficos -->
+      <section class="charts-grid">
+        <div class="chart-container">
+          <h3>Evolución Temporal de la Fila <i>Q</i>(<i>t</i>) en el Turno</h3>
+          <canvas id="queueTimelineChart" height="220"></canvas>
+        </div>
+
+        <div class="chart-container">
+          <h3>Distribución de Tiempos de Espera entre Réplicas (Histograma)</h3>
+          <canvas id="histogramChart" height="220"></canvas>
+        </div>
+      </section>
+
+      <!-- Sección de Intervalo de Confianza y Validación -->
+      <section style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-top: 0;">Estimación Estadística e Intervalo de Confianza al 95%</h3>
+        <p id="ciText">Cargando resultados...</p>
+        <p id="erlangText" style="color: #475569; font-size: 0.9rem; margin-bottom: 0;"></p>
+      </section>
+
+      <!-- Tabla de Réplicas -->
+      <section>
+        <h3>Resultados por Réplica (<i>R</i> = 30)</h3>
+        <div class="table-container">
+          <table id="replicasTable">
+            <thead>
+              <tr>
+                <th>Réplica #</th>
+                <th>Semilla</th>
+                <th>Clientes que Llegaron</th>
+                <th>Clientes Atendidos</th>
+                <th>Tiempo de Espera Medio (<i>W</i><sub>q</sub> s)</th>
+                <th>Tiempo en Sistema (<i>T</i> s)</th>
+                <th>Longitud Cola (<i>L</i><sub>q</sub>)</th>
+                <th>Utilización (<i>U</i> %)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="8" style="text-align: center;">Ejecute la simulación para ver datos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Muestra de Clientes -->
+      <section>
+        <h3>Traza Individual de Clientes Atendidos (Muestra Primera Réplica)</h3>
+        <div class="table-container">
+          <table id="clientsTable">
+            <thead>
+              <tr>
+                <th>Cliente ID</th>
+                <th>Llegada (<i>A</i><sub>i</sub> s)</th>
+                <th>Tiempo Servicio (<i>S</i><sub>i</sub> s)</th>
+                <th>Inicio Atención (<i>B</i><sub>i</sub> s)</th>
+                <th>Fin Atención (<i>D</i><sub>i</sub> s)</th>
+                <th>Espera Fila (<i>W</i><sub>i</sub> s)</th>
+                <th>Tiempo Sistema (<i>T</i><sub>i</sub> s)</th>
+                <th>Cajero Asignado</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="9" style="text-align: center;">Ejecute la simulación para ver la traza.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      let timelineChartInstance = null;
+      let histogramChartInstance = null;
+
+      function presetScenario(c) {
+        document.getElementById('num_cajeros').value = c;
+        runSimulation();
+      }
+
+      async function runSimulation() {
+        const btn = document.getElementById('btnRun');
+        btn.textContent = 'Simulando...';
+        btn.disabled = true;
+
+        const payload = {
+          num_cajeros: document.getElementById('num_cajeros').value,
+          horizon_seconds: document.getElementById('horizon_seconds').value,
+          mean_interarrival: document.getElementById('mean_interarrival').value,
+          service_mean: document.getElementById('service_mean').value,
+          service_std: document.getElementById('service_std').value,
+          service_dist: document.getElementById('service_dist').value,
+          replications: document.getElementById('replications').value,
+          seed: document.getElementById('seed').value
+        };
+
+        try {
+          const res = await fetch('/api/simular', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+
+          if (data.status !== 'success') {
+            alert('Error en simulación: ' + data.message);
+            return;
+          }
+
+          updateUI(data);
+        } catch (err) {
+          console.error(err);
+          alert('Error al comunicarse con el servidor de simulación.');
+        } finally {
+          btn.textContent = 'Ejecutar Simulación';
+          btn.disabled = false;
+        }
+      }
+
+      function updateUI(data) {
+        const sr = data.single_run;
+        const stats = data.stats;
+        const ci = data.confidence_interval;
+        const erlang = data.theoretical_erlang;
+
+        // Actualizar KPIs
+        document.getElementById('kpi_wait').textContent = stats.mean + ' s';
+        document.getElementById('kpi_wait_sub').textContent = (stats.mean / 60).toFixed(2) + ' min promedio (R=' + stats.n + ')';
+
+        document.getElementById('kpi_system').textContent = sr.avg_system_time + ' s';
+        document.getElementById('kpi_util').textContent = sr.utilization_pct + ' %';
+        document.getElementById('kpi_completed').textContent = sr.completed_clients;
+        document.getElementById('kpi_arrivals').textContent = 'Total arribos: ' + sr.total_arrivals;
+        document.getElementById('kpi_queue').textContent = sr.avg_queue_length;
+
+        // Actualizar texto IC
+        document.getElementById('ciText').innerHTML = 
+          `<strong>Estimación puntual:</strong> W̄<sub>q</sub> = ${ci.point_estimate} s | ` +
+          `<strong>Desviación estándar:</strong> S = ${ci.std_dev} s | ` +
+          `<strong>Error estándar:</strong> SE = ${ci.std_error} s<br>` +
+          `<strong>Intervalo de Confianza al 95% (t-Student):</strong> <span style="font-size: 1.15rem; color: #2457a7; font-weight: bold;">[${ci.lower_bound} s, ${ci.upper_bound} s]</span> ` +
+          `equivale a <strong>[${(ci.lower_bound/60).toFixed(2)} min, ${(ci.upper_bound/60).toFixed(2)} min]</strong> en fila.`;
+
+        if (erlang && erlang.stable) {
+          document.getElementById('erlangText').innerHTML = 
+            `<em>Validación Analítica M/M/${erlang.c} (Erlang-C):</em> Espera teórica W<sub>q</sub> = ${erlang.Wq_avg_wait_seconds} s | ` +
+            `Utilización teórica ρ = ${(erlang.utilization_rho * 100).toFixed(1)}% | Cola teórica L<sub>q</sub> = ${erlang.Lq_avg_queue_customers} clientes.`;
+        } else if (erlang && !erlang.stable) {
+          document.getElementById('erlangText').innerHTML = `<em>Nota teórica:</em> ${erlang.message}`;
+        }
+
+        // Gráfico 1: Timeline de Cola
+        renderTimelineChart(sr.queue_timeline);
+
+        // Gráfico 2: Histograma
+        renderHistogramChart(stats.histogram_bins);
+
+        // Tabla de réplicas
+        const repBody = document.querySelector('#replicasTable tbody');
+        repBody.innerHTML = '';
+        data.experiment.replica_results.forEach(rep => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${rep.replica}</td>
+            <td>${rep.seed}</td>
+            <td>${rep.arrivals}</td>
+            <td>${rep.completed}</td>
+            <td><strong>${rep.avg_wait_time} s</strong></td>
+            <td>${rep.avg_system_time} s</td>
+            <td>${rep.avg_queue_length}</td>
+            <td>${rep.utilization_pct} %</td>
+          `;
+          repBody.appendChild(tr);
+        });
+
+        // Tabla de clientes muestra
+        const clientBody = document.querySelector('#clientsTable tbody');
+        clientBody.innerHTML = '';
+        sr.clients_sample.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>#${c.id}</td>
+            <td>${c.arrival_time}</td>
+            <td>${c.service_time}</td>
+            <td>${c.begin_service}</td>
+            <td>${c.departure_time}</td>
+            <td>${c.wait_time}</td>
+            <td>${c.system_time}</td>
+            <td>Cajero ${c.cajero_id}</td>
+            <td><span class="${c.completed ? 'badge-ok' : 'badge-busy'}">${c.completed ? 'Completado' : 'En proceso'}</span></td>
+          `;
+          clientBody.appendChild(tr);
+        });
+      }
+
+      function renderTimelineChart(timeline) {
+        const ctx = document.getElementById('queueTimelineChart').getContext('2d');
+        if (timelineChartInstance) timelineChartInstance.destroy();
+
+        const labels = timeline.map(p => p.t_min + 'm');
+        const queueData = timeline.map(p => p.queue);
+        const sysData = timeline.map(p => p.system);
+
+        timelineChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Clientes en Fila Q(t)',
+                data: queueData,
+                borderColor: '#dc2626',
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                fill: true,
+                tension: 0.2
+              },
+              {
+                label: 'Total en Sistema L(t)',
+                data: sysData,
+                borderColor: '#2457a7',
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: { title: { display: true, text: 'Minutos del turno' } },
+              y: { title: { display: true, text: 'Cantidad de personas' }, beginAtZero: true }
+            }
+          }
+        });
+      }
+
+      function renderHistogramChart(bins) {
+        const ctx = document.getElementById('histogramChart').getContext('2d');
+        if (histogramChartInstance) histogramChartInstance.destroy();
+
+        const labels = bins.map(b => b.bin_label);
+        const counts = bins.map(b => b.count);
+
+        histogramChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Frecuencia de Réplicas (Espera Wq)',
+              data: counts,
+              backgroundColor: '#2457a7',
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: { title: { display: true, text: 'Intervalo de tiempo de espera (segundos)' } },
+              y: { title: { display: true, text: 'Número de réplicas' }, beginAtZero: true, ticks: { precision: 0 } }
+            }
+          }
+        });
+      }
+
+      // Ejecutar simulación inicial al cargar la página
+      window.addEventListener('DOMContentLoaded', () => {
+        runSimulation();
+      });
+    </script>
+  </body>
+</html>
